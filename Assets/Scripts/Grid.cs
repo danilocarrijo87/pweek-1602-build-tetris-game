@@ -71,7 +71,7 @@ public class Grid : MonoBehaviour
                         DestroyImmediate(blockLoction[a, heigth].piece.gameObject);
                         blockLoction[a, heigth] = null;
                     }
-                    for (var k = 0; k < transform.localScale.y; k++)
+                    for (var k = heigth; k < transform.localScale.y; k++)
                     {
                         if (k + 1 < transform.localScale.y)
                         {
