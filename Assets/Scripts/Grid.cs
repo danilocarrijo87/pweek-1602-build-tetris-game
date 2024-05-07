@@ -8,12 +8,12 @@ public class Grid : MonoBehaviour
 {
     public GameObject[] blocks;
     public GameObject spawnPoint;
-    private BlockPiece[,] blockLoction;
+    private BlockPiece[,] _blockLocation;
     
     // Start is called before the first frame update
     void Start()
     {
-        blockLoction = new BlockPiece[(int) transform.localScale.x, (int) transform.localScale.y];
+        _blockLocation = new BlockPiece[(int) transform.localScale.x, (int) transform.localScale.y];
         NewBlock();
     }
     
@@ -24,7 +24,7 @@ public class Grid : MonoBehaviour
             var position = block.transform.position;
             var posX = Mathf.RoundToInt(position.x);
             var posY = Mathf.RoundToInt(position.y);
-            blockLoction[posX, posY] = new BlockPiece(id, block);
+            _blockLocation[posX, posY] = new BlockPiece(id, block);
         }
     }
     public void ClearBlocksPos(Transform blockObj)
@@ -34,20 +34,20 @@ public class Grid : MonoBehaviour
             var position = block.transform.position;
             var posX = Mathf.RoundToInt(position.x);
             var posY = Mathf.RoundToInt(position.y);
-            blockLoction[posX, posY] = null;
+            _blockLocation[posX, posY] = null;
         }
     }
 
     public bool CanMove(int posX, int posY, string id)
     {
-        return blockLoction[posX, posY] == null || blockLoction[posX, posY].id == id;
+        return _blockLocation[posX, posY] == null || _blockLocation[posX, posY].id == id;
     }
 
-    public bool IsLineCompleted(int posY)
+    private bool IsLineCompleted(int posY)
     {
         for (var j = 0; j < transform.localScale.x; j++)
         {
-            if (blockLoction[j, posY] == null)
+            if (_blockLocation[j, posY] == null)
             {
                 return false;
             }
@@ -65,20 +65,20 @@ public class Grid : MonoBehaviour
             {
                 for (var a = 0; a < transform.localScale.x; a++)
                 { 
-                    if (blockLoction[a, heigth] != null)
+                    if (_blockLocation[a, heigth] != null)
                     {
                         GameManager.Instance.Score += 10;
-                        DestroyImmediate(blockLoction[a, heigth].piece.gameObject);
-                        blockLoction[a, heigth] = null;
+                        DestroyImmediate(_blockLocation[a, heigth].piece.gameObject);
+                        _blockLocation[a, heigth] = null;
                     }
                     for (var k = heigth; k < transform.localScale.y; k++)
                     {
                         if (k + 1 < transform.localScale.y)
                         {
-                            if (blockLoction[a, k + 1] == null) continue;
-                            blockLoction[a, k] = blockLoction[a, k + 1];
-                            blockLoction[a, k + 1] = null;
-                            blockLoction[a, k].piece.position  += new Vector3(0, -1, 0);
+                            if (_blockLocation[a, k + 1] == null) continue;
+                            _blockLocation[a, k] = _blockLocation[a, k + 1];
+                            _blockLocation[a, k + 1] = null;
+                            _blockLocation[a, k].piece.position  += new Vector3(0, -1, 0);
                         }
                     }
                 }
@@ -104,7 +104,7 @@ public class Grid : MonoBehaviour
         {
             for (var i = 0; i < transform.localScale.y; i++)
             {
-                blockLoction[j, i] = null;
+                _blockLocation[j, i] = null;
             }
         }
 

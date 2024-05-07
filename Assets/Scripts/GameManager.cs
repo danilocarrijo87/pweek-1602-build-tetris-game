@@ -6,22 +6,19 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
     public float gameSpeed = 0.8f;
-    private int score = 0;
-    public delegate void onSocreChangeDelegate(int score);
-    public event onSocreChangeDelegate OnScoreChangeEvent;
-    public delegate void isGameOverDelegate(bool isGameOver);
-    public event isGameOverDelegate OnGameOverEvent;
+    private int _score = 0;
+    public delegate void OnSocreChangeDelegate(int score);
+    public event OnSocreChangeDelegate OnScoreChangeEvent;
+    public delegate void IsGameOverDelegate(bool isGameOver);
+    public event IsGameOverDelegate OnGameOverEvent;
 
     public int Score
     {
-        get
-        {
-            return score;
-        }
+        get => _score;
         set
         {
-            score = value;
-            OnScoreChangeEvent?.Invoke(score);
+            _score = value;
+            OnScoreChangeEvent?.Invoke(_score);
         }
     }
 
@@ -45,12 +42,10 @@ public class GameManager : MonoBehaviour
     {
         get
         {
-            if(_instance == null)
-            {
-                GameObject go = new GameObject("GameManager");
-                go.AddComponent<GameManager>();
-            }
- 
+            if (_instance != null) return _instance;
+            GameObject go = new GameObject("GameManager");
+            go.AddComponent<GameManager>();
+
             return _instance;
         }
     }
