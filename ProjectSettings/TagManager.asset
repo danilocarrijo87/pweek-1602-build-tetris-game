@@ -4,13 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Grid
-  - Block
+  - BoardGrid
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - BoardGrid
   - Water
   - UI
   - 
