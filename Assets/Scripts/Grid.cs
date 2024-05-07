@@ -113,7 +113,7 @@ public class Grid : MonoBehaviour
 
         NewBlock();
     }
-        
+
     public void NewBlock()
     {
         Instantiate(blocks[_nextBlock], spawnPoint.transform.position, quaternion.identity);
