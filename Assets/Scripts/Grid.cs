@@ -8,7 +8,10 @@ public class Grid : MonoBehaviour
 {
     public GameObject[] blocks;
     public GameObject spawnPoint;
+    public GameObject newxtBlockPoint;
+    private int _nextBlock;
     private BlockPiece[,] _blockLocation;
+    private GameObject _nextBlockObj;
     
     // Start is called before the first frame update
     void Start()
@@ -113,6 +116,9 @@ public class Grid : MonoBehaviour
 
     public void NewBlock()
     {
-        Instantiate(blocks[Random.Range(0, blocks.Length)], spawnPoint.transform.position, quaternion.identity);
+        Instantiate(blocks[_nextBlock], spawnPoint.transform.position, quaternion.identity);
+        _nextBlock = Random.Range(0, blocks.Length);
+        Destroy(_nextBlockObj);
+        _nextBlockObj = Instantiate(blocks[_nextBlock], newxtBlockPoint.transform.position, quaternion.identity);
     }
 }
