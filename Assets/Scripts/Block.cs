@@ -41,7 +41,7 @@ public class Block : MonoBehaviour
             {
                 MoveX(1);
             }
-            if (Input.GetKeyDown(KeyCode.UpArrow) && CanMove(0))
+            if (Input.GetKeyDown(KeyCode.UpArrow) && CanRotate())
             {
                 _grid.ClearBlocksPos(this.transform);
                 transform.RotateAround( transform.TransformPoint(pivot), new Vector3(0,0,1), 90);
@@ -65,6 +65,33 @@ public class Block : MonoBehaviour
         _grid.UpdateBlocksPos(transform, id);
     }
 
+    private bool CanRotate()
+    {
+        Quaternion rotation = Quaternion.Euler(0, 0, 90);
+        Vector3 pivotPoint = transform.TransformPoint(pivot);
+
+        foreach (Transform block in transform)
+        {
+            Vector3 dir = block.position - pivotPoint;
+            dir = rotation * dir;
+            Vector3 newPos = pivotPoint + dir;
+
+            int posX = Mathf.RoundToInt(newPos.x);
+            int posY = Mathf.RoundToInt(newPos.y);
+
+            if (posX < 0 || posX >= _grid.transform.localScale.x)
+            {
+                return false;
+            }
+
+            if (!_grid.CanMove(posX, posY, id))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     private bool CanMove(int xModifier)
     {
         foreach (Transform block in transform)
@@ -72,7 +99,6 @@ public class Block : MonoBehaviour
             var position = block.transform.position;
             var posX = Mathf.RoundToInt(position.x + xModifier);
             var posY = Mathf.RoundToInt(position.y - 1);
-            
             
             if (posX < 0 || posX >= _grid.transform.localScale.x)
             {
