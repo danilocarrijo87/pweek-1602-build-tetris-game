@@ -16,13 +16,13 @@ public class MovementScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        movements[(int)KeyCode.LeftArrow] = new Vector3(-1, 0, 0);
-        movements[(int)KeyCode.RightArrow] = new Vector3(1, 0, 0);
-        movements[(int)KeyCode.DownArrow] = new Vector3(0, 0, -1);
-        movements[(int)KeyCode.UpArrow] = new Vector3(0, 0, 1);
-        movements[(int)KeyCode.Space] = new Vector3(0, -1, 0);
-        movements[(int)KeyCode.LeftShift] = new Vector3(0, 0, -90);
-        movements[(int)KeyCode.LeftControl] = new Vector3(-90, 0, 0);
+        movements[(int)KeyCode.LeftArrow] = Vector3.left;
+        movements[(int)KeyCode.RightArrow] = Vector3.right;
+        movements[(int)KeyCode.DownArrow] = Vector3.back;
+        movements[(int)KeyCode.UpArrow] = Vector3.forward;
+        movements[(int)KeyCode.Space] = Vector3.down;
+        movements[(int)KeyCode.LeftShift] = new Vector3(0, 0, -90);   // Rotate on Z axis
+        movements[(int)KeyCode.LeftControl] = new Vector3(-90, 0, 0); // Rotate on X axis
         
         gridManagement = GameObject.FindWithTag("BoardGrid").GetComponent<GridManagement>();
     }
@@ -112,8 +112,8 @@ public class MovementScript : MonoBehaviour
             if (!isGameOver)
             {
                 gridManagement.AddPieceToSpace(transform);
-                FindObjectOfType<SpawnPieceScript>().NewPiece();
                 gridManagement.CheckCompletedPlanes(transform);
+                FindObjectOfType<SpawnPieceScript>().NewPiece();
             }
             else
             {

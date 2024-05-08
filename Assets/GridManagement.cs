@@ -20,20 +20,8 @@ public class GridManagement : MonoBehaviour
             var roundedX = Mathf.RoundToInt(pieceBlock.transform.position.x);
             var roundedY = Mathf.RoundToInt(pieceBlock.transform.position.y);        
             var roundedZ = Mathf.RoundToInt(pieceBlock.transform.position.z);
-
-            AddPieceBlockToSpace(roundedX,roundedY,roundedZ, piece);
-        }
-    }
-
-    public void RemovePieceFromSpace(Transform piece)
-    {
-        foreach (Transform pieceBlock in piece)
-        {
-            var roundedX = Mathf.RoundToInt(pieceBlock.transform.position.x);
-            var roundedY = Mathf.RoundToInt(pieceBlock.transform.position.y);        
-            var roundedZ = Mathf.RoundToInt(pieceBlock.transform.position.z);
-
-            RemovePieceBlockFromSpace(roundedX,roundedY,roundedZ);
+            
+            AddPieceBlockToSpace(roundedX,roundedY,roundedZ, pieceBlock);
         }
     }
 
@@ -59,45 +47,47 @@ public class GridManagement : MonoBehaviour
         return true;
     }
 
-    // Need to implement rotate first so I can test it
-    public bool CheckCompletedPlanes(Transform piece)
+    public void CheckCompletedPlanes(Transform piece)
     {
-        var completedPlane = false;
         var intervalY = GetMinAndMaxY(piece);
 
-        for (var y = intervalY.Item1; y <= intervalY.Item2; y++)
-        {
-            if (!IsLineComplete(y))
-            {
-                continue;
-            }
+        CheckPlane();
+    }
 
-            DestroyPlane(y);
-            completedPlane = true;
+    private void CheckPlane(int coordYToCheck = 0)
+    {
+        if (coordYToCheck > transform.localScale.y) return;
+        
+        if (!IsPlaneComplete(coordYToCheck))
+        {
+            Debug.Log($"{coordYToCheck}");
+            CheckPlane(coordYToCheck + 1);
         }
-
-        /*if (completedPlane)
+        else
         {
-            LowerAbovePieces(intervalY.Item1);
-        }*/
-
-        return completedPlane;
+            Debug.Log($"LIMPOU: -> {coordYToCheck}");
+            DestroyPlane(coordYToCheck);
+            LowerAbovePieces(coordYToCheck);
+            CheckPlane(coordYToCheck);
+        }
     }
 
     private void LowerAbovePieces(int posY)
     {
-        for (var y = posY; y < transform.localScale.y; y++)
+        for (var y = posY; y < transform.localScale.y-1; y++)
         {
-            for (var x = 0; x <= transform.localScale.x; x++)
+            for (var x = 0; x < transform.localScale.x; x++)
             {
-                for (var z = 0; z <= transform.localScale.z; z++)
+                for (var z = 0; z < transform.localScale.z; z++)
                 {
                     gridSquares[x, y, z] = gridSquares[x, y + 1, z];
                     gridSquares[x, y + 1, z] = null;
                     
+                    Debug.Log($"{x}, {y}, {z}");
+                    
                     if (gridSquares[x, y, z] != null)
                     {
-                        gridSquares[x, y, z].transform.position += new Vector3(0, -1, 0);
+                        gridSquares[x, y, z].position += Vector3.down;
                     }
                 }
             }
@@ -106,17 +96,20 @@ public class GridManagement : MonoBehaviour
     
     private void DestroyPlane(int posY)
     {
-        for (int x = 0; x < transform.localScale.x; x++)
+        for (var x = 0; x < transform.localScale.x; x++)
         {
-            for (int z = 0; z <= transform.localScale.z; z++)
+            for (var z = 0; z < transform.localScale.z; z++)
             {
-                DestroyImmediate(gridSquares[x,posY,z].gameObject);
-                RemovePieceBlockFromSpace(x, posY, z);
+                if (gridSquares[x, posY, z] != null)
+                {
+                    DestroyImmediate(gridSquares[x,posY,z].gameObject);
+                    RemovePieceBlockFromSpace(x, posY, z);
+                }
             }
         }
     }
 
-    private bool IsLineComplete(int posY)
+    private bool IsPlaneComplete(int posY)
     {
         for (var z = 0; z < transform.localScale.z; z++)
         {
@@ -222,6 +215,6 @@ public class GridManagement : MonoBehaviour
 
     private bool IsZValid(int z)
     {
-        return z >= 0 && z <= transform.localScale.z;
+        return z >= 0 && z < transform.localScale.z;
     }
 }

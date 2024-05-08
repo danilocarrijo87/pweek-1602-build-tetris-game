@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638506025507757810
-    m_Hash: 3180487116
+      ticks: 638506895513745599
+    m_Hash: 2086951786
   m_LockFileStatus:
     m_FilePath: C:/projectWeek/may2024/TetrisDanilo/pweek-1602-build-tetris-game/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638506025954975854
-    m_Hash: 838182172
+      ticks: 638506895513755597
+    m_Hash: 744252605
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
