@@ -21,6 +21,8 @@ public class Block : MonoBehaviour
     private static Color lightBlue = new Color(127f, 175f, 208f);
     private static Color blue = new Color(42f, 122f, 176f);
     private static Color darkBlue = new Color(21f, 61f, 88f);
+
+    // Start is called before the first frame update
     void Start()
     {
         _grid = GameObject.FindWithTag("Grid").GetComponent<Grid>();
@@ -37,7 +39,7 @@ public class Block : MonoBehaviour
             var color = blockColors[0];
             Debug.Log(color);
             Debug.Log(Color.yellow);
-            spriteRenderer.color = new Color(21f, 61f, 88f);
+            // spriteRenderer.color = new Color(21f, 61f, 88f);
         }
     }
 
