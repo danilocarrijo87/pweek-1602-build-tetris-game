@@ -47,6 +47,15 @@ public class Block : MonoBehaviour
             Debug.Log(Color.yellow);
             spriteRenderer.color = new Color(21f, 61f, 88f);
         }
+        List<Color> blockColors = new List<Color>() { lightGreen, green, darkGreen, lightBlue, blue, darkBlue };
+        SpriteRenderer[] sprites = GetComponentsInChildren<SpriteRenderer>();
+        foreach (var spriteRenderer in sprites)
+        {
+            var color = blockColors[0];
+            Debug.Log(color);
+            Debug.Log(Color.yellow);
+            spriteRenderer.color = new Color(21f, 61f, 88f);
+        }
     }
 
 
