@@ -15,6 +15,13 @@ public class Block : MonoBehaviour
 
     private bool _isBlocked = false;
 
+    private Color lightGreen = new Color(171f/255f, 211f/255f, 179f/255f);
+    private Color green = new Color(115f/255f, 182f/255f, 128f/255f);
+    private Color darkGreen = new Color(58f/255f, 91f/255f, 64f/255f);
+    private Color lightBlue = new Color(127f/255f, 175f/255f, 208f/255f);
+    private Color blue = new Color(42f/255f, 122f/255f, 176f/255f);
+    private Color darkBlue = new Color(21f/255f, 61f/255f, 88f/255f);
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +32,13 @@ public class Block : MonoBehaviour
     private void Awake()
     {
         id = Guid.NewGuid().ToString();
+        List<Color> blockColors = new List<Color>() { lightGreen, green, darkGreen, lightBlue, blue, darkBlue };
+        SpriteRenderer[] sprites = GetComponentsInChildren<SpriteRenderer>();
+        var color = blockColors[UnityEngine.Random.Range(0, blockColors.Count - 1)];
+        foreach (var spriteRenderer in sprites)
+        {
+            spriteRenderer.color = color;
+        }
     }
 
 
