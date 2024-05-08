@@ -8,8 +8,11 @@ using Vector3 = UnityEngine.Vector3;
 public class MovementScript : MonoBehaviour
 {
     private static GridManagement gridManagement;
+    private SpawnPieceScript spawnPieceScript;
+    
     private float previousTime;
     private float defaultFallTime = 1f;
+    private bool isGameAlive = true;
 
     private Dictionary<int, Vector3> movements = new();
     
@@ -25,11 +28,14 @@ public class MovementScript : MonoBehaviour
         movements[(int)KeyCode.LeftControl] = new Vector3(-90, 0, 0); // Rotate on X axis
         
         gridManagement = GameObject.FindWithTag("BoardGrid").GetComponent<GridManagement>();
+        spawnPieceScript = GameObject.FindWithTag("PieceSpawner").GetComponent<SpawnPieceScript>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!isGameAlive) return;
+        
         Vector3 move = default;
         
         if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -100,28 +106,44 @@ public class MovementScript : MonoBehaviour
         
         var move = movements[(int)KeyCode.Space];
         MovePiece(move);
-        
-        // Can be improved by checking only the Y coord.
-        if (!gridManagement.ValidMove(transform))
+
+        if (gridManagement.ValidMove(transform, false))
+        {
+            if (!gridManagement.IsGridSpaceAvailable(transform))
+            {
+                ResetMove(move);
+                this.enabled = false;
+            
+                var isGameOver = gridManagement.IsGameOver(transform.position.y);
+                
+                if (!isGameOver)
+                {
+                    InvalidMove(transform);
+                }
+                else
+                {
+                    isGameAlive = false;
+                    spawnPieceScript.GameOver();
+                    //gridManagement.ResetGame();
+                }
+            }
+        }
+        else
         {
             ResetMove(move);
             this.enabled = false;
-            
-            var isGameOver = gridManagement.IsGameOver(transform.position.y);
 
-            if (!isGameOver)
-            {
-                gridManagement.AddPieceToSpace(transform);
-                gridManagement.CheckCompletedPlanes(transform);
-                FindObjectOfType<SpawnPieceScript>().NewPiece();
-            }
-            else
-            {
-                gridManagement.ResetGame();
-            }
+            InvalidMove(transform);
         }
         
         previousTime = Time.time;
+    }
+
+    private void InvalidMove(Transform piece)
+    {
+        gridManagement.AddPieceToSpace(transform);
+        gridManagement.CheckCompletedPlanes(transform);
+        spawnPieceScript.NewPiece();
     }
 
     public void IncrementLowerSpeed(float value)
