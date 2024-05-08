@@ -44,17 +44,31 @@ public class Block : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.UpArrow) && CanRotate())
             {
                 _grid.ClearBlocksPos(this.transform);
-                transform.RotateAround( transform.TransformPoint(pivot), new Vector3(0,0,1), 90);
+                transform.RotateAround(transform.TransformPoint(pivot), new Vector3(0,0,1), 90);
                 _grid.UpdateBlocksPos(this.transform, id);
             }
-
-            if (CanMove(0) && Time.time - _loopTime > (Input.GetKey(KeyCode.DownArrow) ? GameManager.Instance.gameSpeed /10 : GameManager.Instance.gameSpeed))
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                HardDrop();
+            } 
+            else if (CanMove(0) && Time.time - _loopTime > (Input.GetKey(KeyCode.DownArrow) ? GameManager.Instance.gameSpeed / 10 : GameManager.Instance.gameSpeed))
             {
                 _grid.ClearBlocksPos(this.transform);
-                transform.position  += new Vector3(0, -1, 0);
+                transform.position += new Vector3(0, -1, 0);
                 _loopTime = Time.time;
                 _grid.UpdateBlocksPos(this.transform, id);
             }
+        }
+    }
+
+    private void HardDrop()
+    {
+        while (CanMove(0) && this.enabled)
+        {
+            _grid.ClearBlocksPos(this.transform);
+            transform.position += new Vector3(0, -1, 0);
+            _loopTime = Time.time;
+            _grid.UpdateBlocksPos(this.transform, id);
         }
     }
 

@@ -12,6 +12,7 @@ public class Grid : MonoBehaviour
     private int _nextBlock;
     private BlockPiece[,] _blockLocation;
     private GameObject _nextBlockObj;
+    private static int _previousScore = 0;
     
     // Start is called before the first frame update
     void Start()
@@ -84,6 +85,11 @@ public class Grid : MonoBehaviour
                             _blockLocation[a, k].piece.position  += new Vector3(0, -1, 0);
                         }
                     }
+                }
+                if (GameManager.Instance.Score - _previousScore >= 1000)
+                {
+                    GameManager.Instance.gameSpeed -= 0.1f;
+                    _previousScore = GameManager.Instance.Score;
                 }
                 CheckLines(heigth);
             }
