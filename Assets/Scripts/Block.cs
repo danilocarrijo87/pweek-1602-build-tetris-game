@@ -15,6 +15,13 @@ public class Block : MonoBehaviour
 
     private bool _isBlocked = false;
 
+    private static Color lightGreen = new Color(171f, 211f, 179f);
+    private static Color green = new Color(115f, 182f, 128f);
+    private static Color darkGreen = new Color(58f, 91f, 64f);
+    private static Color lightBlue = new Color(127f, 175f, 208f);
+    private static Color blue = new Color(42f, 122f, 176f);
+    private static Color darkBlue = new Color(21f, 61f, 88f);
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +32,15 @@ public class Block : MonoBehaviour
     private void Awake()
     {
         id = Guid.NewGuid().ToString();
+        List<Color> blockColors = new List<Color>() { lightGreen, green, darkGreen, lightBlue, blue, darkBlue };
+        SpriteRenderer[] sprites = GetComponentsInChildren<SpriteRenderer>();
+        foreach (var spriteRenderer in sprites)
+        {
+            var color = blockColors[0];
+            Debug.Log(color);
+            Debug.Log(Color.yellow);
+            spriteRenderer.color = new Color(21f, 61f, 88f);
+        }
     }
 
 
