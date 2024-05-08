@@ -6,11 +6,14 @@ using UnityEngine;
 public class GridManagement : MonoBehaviour
 {
     private Transform[,,] gridSquares;
+    private static ScoreManagement scoreManagement;
     
     // Start is called before the first frame update
     void Start()
     {
         gridSquares = new Transform[(int) transform.localScale.x+1, (int) transform.localScale.y+1, (int) transform.localScale.z+1];
+
+        scoreManagement = GameObject.FindGameObjectWithTag("ScoreLogic").GetComponent<ScoreManagement>();
     }
 
     public void AddPieceToSpace(Transform piece)
@@ -25,7 +28,7 @@ public class GridManagement : MonoBehaviour
         }
     }
 
-    public bool ValidMove(Transform piece)
+    public bool ValidMove(Transform piece, bool checkCollisions = true)
     {
         foreach (Transform pieceBlock in piece)
         {
@@ -38,6 +41,23 @@ public class GridManagement : MonoBehaviour
                 return false;
             }
 
+            if (checkCollisions && !IsSpaceFree(roundedX, roundedY, roundedZ))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public bool IsGridSpaceAvailable(Transform piece)
+    {
+        foreach (Transform pieceBlock in piece)
+        {
+            var roundedX = Mathf.RoundToInt(pieceBlock.transform.position.x);
+            var roundedY = Mathf.RoundToInt(pieceBlock.transform.position.y);
+            var roundedZ = Mathf.RoundToInt(pieceBlock.transform.position.z);
+
             if (!IsSpaceFree(roundedX, roundedY, roundedZ))
             {
                 return false;
@@ -49,27 +69,30 @@ public class GridManagement : MonoBehaviour
 
     public void CheckCompletedPlanes(Transform piece)
     {
+        // I think we can start checking for completed line from the small Y coord of the new piece
         var intervalY = GetMinAndMaxY(piece);
-
-        CheckPlane();
+        var completedLines = CheckPlane();
+        
+        scoreManagement.AddScore(completedLines);
     }
 
-    private void CheckPlane(int coordYToCheck = 0)
+    private int CheckPlane(int coordYToCheck = 0)
     {
-        if (coordYToCheck > transform.localScale.y) return;
+        var completedLines = 0;
+        if (coordYToCheck > transform.localScale.y) return completedLines;
         
         if (!IsPlaneComplete(coordYToCheck))
         {
-            Debug.Log($"{coordYToCheck}");
-            CheckPlane(coordYToCheck + 1);
+            completedLines = CheckPlane(coordYToCheck + 1);
         }
         else
         {
-            Debug.Log($"LIMPOU: -> {coordYToCheck}");
             DestroyPlane(coordYToCheck);
             LowerAbovePieces(coordYToCheck);
-            CheckPlane(coordYToCheck);
+            completedLines = 1 + CheckPlane(coordYToCheck);
         }
+
+        return completedLines;
     }
 
     private void LowerAbovePieces(int posY)
@@ -82,8 +105,6 @@ public class GridManagement : MonoBehaviour
                 {
                     gridSquares[x, y, z] = gridSquares[x, y + 1, z];
                     gridSquares[x, y + 1, z] = null;
-                    
-                    Debug.Log($"{x}, {y}, {z}");
                     
                     if (gridSquares[x, y, z] != null)
                     {
@@ -160,7 +181,7 @@ public class GridManagement : MonoBehaviour
     public bool IsGameOver(float posY)
     {
         var roundedY = Mathf.RoundToInt(posY);
-
+        
         return roundedY >= transform.localScale.y;
     }
 
@@ -200,6 +221,9 @@ public class GridManagement : MonoBehaviour
         int posY,
         int posZ)
     {
+        if (posX > gridSquares.GetLength(0) || posY >= gridSquares.GetLength(1) ||
+            posZ > gridSquares.GetLength(2)) return true;
+        
         return gridSquares[posX, posY, posZ] == null;
     }
 
