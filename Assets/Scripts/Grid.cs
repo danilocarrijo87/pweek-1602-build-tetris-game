@@ -13,6 +13,7 @@ public class Grid : MonoBehaviour
     private BlockPiece[,] _blockLocation;
     private GameObject _nextBlockObj;
     private static int _previousScore = 0;
+    public GameObject fireWorks;
     
     // Start is called before the first frame update
     void Start()
@@ -60,11 +61,11 @@ public class Grid : MonoBehaviour
         return true;
     }
 
-    public void CheckLines(int heigth = 0, int firstLineDestroyed = 0, int lineCount = 0)
+    public void CheckLines(int heigth = 0, int lineCount = 0)
     {
         if (heigth < transform.localScale.y)
         {
-            if (!IsLineCompleted(heigth)) CheckLines(heigth + 1, firstLineDestroyed, lineCount);
+            if (!IsLineCompleted(heigth)) CheckLines(heigth + 1, lineCount);
             else
             {
                 for (var a = 0; a < transform.localScale.x; a++)
@@ -76,14 +77,6 @@ public class Grid : MonoBehaviour
                         {
                             _blockLocation[a, heigth].piece.GetComponent<BlockBlink>().willBeDestroyed = true;
                         }
-
-                        if (lineCount == 0)
-                        {
-                            firstLineDestroyed = heigth;
-                        }
-
-                        lineCount++;
-                        
                         Destroy(_blockLocation[a, heigth].piece.gameObject, GameManager.Instance.destroyBlockTime);
                         _blockLocation[a, heigth] = null;
                     }
@@ -103,9 +96,23 @@ public class Grid : MonoBehaviour
                     GameManager.Instance.gameSpeed -= 0.1f;
                     _previousScore = GameManager.Instance.Score;
                 }
-                CheckLines(heigth);
+                CheckLines(heigth, lineCount += 1);
             }
         }
+        
+        Debug.Log(lineCount);
+
+        if (lineCount >= GameManager.Instance.lineNeededToActivateEffect)
+        {
+            StartCoroutine(CongratsEffect());
+        }
+    }
+
+    private IEnumerator CongratsEffect()
+    {
+        fireWorks.SetActive(true);
+        yield return new WaitForSeconds(3f);
+        fireWorks.SetActive(false);
     }
 
     private IEnumerator PullDown(Transform piece)

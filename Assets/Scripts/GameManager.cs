@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public event IsGameOverDelegate OnGameOverEvent;
     public float blockBlinkSpeed;
     public float destroyBlockTime;
+    public int lineNeededToActivateEffect;
 
     public int Score
     {
