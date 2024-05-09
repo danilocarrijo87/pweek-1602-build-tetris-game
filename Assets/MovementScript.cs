@@ -9,6 +9,7 @@ public class MovementScript : MonoBehaviour
 {
     private static GridManagement gridManagement;
     private SpawnPieceScript spawnPieceScript;
+    private GameOverScript gameOverScript;
     
     private float previousTime;
     private float defaultFallTime = 1f;
@@ -29,6 +30,14 @@ public class MovementScript : MonoBehaviour
         
         gridManagement = GameObject.FindWithTag("BoardGrid").GetComponent<GridManagement>();
         spawnPieceScript = GameObject.FindWithTag("PieceSpawner").GetComponent<SpawnPieceScript>();
+        gameOverScript = GameObject.FindGameObjectWithTag("GameOver").GetComponent<GameOverScript>();
+
+        if (IsNextInfoPiece()) this.enabled = false;
+    }
+
+    private bool IsNextInfoPiece()
+    {
+        return !gridManagement.ValidMove(transform, false);
     }
 
     // Update is called once per frame
@@ -124,6 +133,7 @@ public class MovementScript : MonoBehaviour
                 {
                     isGameAlive = false;
                     spawnPieceScript.GameOver();
+                    gameOverScript.GameOver();
                     //gridManagement.ResetGame();
                 }
             }
