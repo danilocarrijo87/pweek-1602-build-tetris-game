@@ -94,7 +94,7 @@ public class Grid : MonoBehaviour
                             if (_blockLocation[a, k + 1] == null) continue;
                             _blockLocation[a, k] = _blockLocation[a, k + 1];
                             _blockLocation[a, k + 1] = null;
-                            StartCoroutine(PullDown(a, k));
+                            StartCoroutine(PullDown(_blockLocation[a, k].piece));
                         }
                     }
                 }
@@ -108,12 +108,12 @@ public class Grid : MonoBehaviour
         }
     }
 
-    private IEnumerator PullDown(int x, int y)
+    private IEnumerator PullDown(Transform piece)
     {
         yield return new WaitForSeconds(GameManager.Instance.destroyBlockTime);
-        if (_blockLocation[x, y] != null)
+        if (piece != null)
         {
-            _blockLocation[x, y].piece.position  += new Vector3(0, -1, 0);
+            piece.position  += new Vector3(0, -1, 0);
         }
     }
 
