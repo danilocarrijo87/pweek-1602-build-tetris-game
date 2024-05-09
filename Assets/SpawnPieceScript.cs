@@ -20,10 +20,8 @@ public class SpawnPieceScript : MonoBehaviour
     {
         if (!isGameAlive) return;
         
-        //var spawnPosition = new Vector3(5, 18, 5);
-        var spawnPosition = new Vector3(1, 24, 1);
-        Instantiate(Pieces[0], spawnPosition, Quaternion.identity);
-        //Instantiate(Pieces[Random.Range(0, Pieces.Length)], spawnPosition, Quaternion.identity);
+        var spawnPosition = new Vector3(5f, 24, 5f);
+        Instantiate(Pieces[Random.Range(0, Pieces.Length)], transform.position, Quaternion.identity);
     }
 
     public void GameOver()
