@@ -111,7 +111,10 @@ public class Grid : MonoBehaviour
     private IEnumerator PullDown(int x, int y)
     {
         yield return new WaitForSeconds(GameManager.Instance.destroyBlockTime);
-        _blockLocation[x, y].piece.position  += new Vector3(0, -1, 0);
+        if (_blockLocation[x, y] != null)
+        {
+            _blockLocation[x, y].piece.position  += new Vector3(0, -1, 0);
+        }
     }
 
     public bool IsGameOver(int posY)
