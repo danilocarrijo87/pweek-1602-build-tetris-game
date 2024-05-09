@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public event OnSocreChangeDelegate OnScoreChangeEvent;
     public delegate void IsGameOverDelegate(bool isGameOver);
     public event IsGameOverDelegate OnGameOverEvent;
+    public float blockBlinkSpeed;
+    public float destroyBlockTime;
 
     public int Score
     {

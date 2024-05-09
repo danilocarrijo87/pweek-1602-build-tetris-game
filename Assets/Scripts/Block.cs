@@ -13,7 +13,9 @@ public class Block : MonoBehaviour
     [HideInInspector]
     public string id;
 
+
     private bool _isBlocked = false;
+    private Color color;
 
     private Color lightGreen = new Color(171f/255f, 211f/255f, 179f/255f);
     private Color green = new Color(115f/255f, 182f/255f, 128f/255f);
@@ -34,7 +36,7 @@ public class Block : MonoBehaviour
         id = Guid.NewGuid().ToString();
         List<Color> blockColors = new List<Color>() { lightGreen, green, darkGreen, lightBlue, blue, darkBlue };
         SpriteRenderer[] sprites = GetComponentsInChildren<SpriteRenderer>();
-        var color = blockColors[UnityEngine.Random.Range(0, blockColors.Count - 1)];
+        color = blockColors[UnityEngine.Random.Range(0, blockColors.Count - 1)];
         foreach (var spriteRenderer in sprites)
         {
             spriteRenderer.color = color;

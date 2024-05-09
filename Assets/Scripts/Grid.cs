@@ -60,11 +60,11 @@ public class Grid : MonoBehaviour
         return true;
     }
 
-    public void CheckLines(int heigth = 0)
+    public void CheckLines(int heigth = 0, int firstLineDestroyed = 0, int lineCount = 0)
     {
         if (heigth < transform.localScale.y)
         {
-            if (!IsLineCompleted(heigth)) CheckLines(heigth + 1);
+            if (!IsLineCompleted(heigth)) CheckLines(heigth + 1, firstLineDestroyed, lineCount);
             else
             {
                 for (var a = 0; a < transform.localScale.x; a++)
@@ -72,7 +72,19 @@ public class Grid : MonoBehaviour
                     if (_blockLocation[a, heigth] != null)
                     {
                         GameManager.Instance.Score += 10;
-                        DestroyImmediate(_blockLocation[a, heigth].piece.gameObject);
+                        if (_blockLocation[a, heigth].piece.GetComponent<BlockBlink>() != null)
+                        {
+                            _blockLocation[a, heigth].piece.GetComponent<BlockBlink>().willBeDestroyed = true;
+                        }
+
+                        if (lineCount == 0)
+                        {
+                            firstLineDestroyed = heigth;
+                        }
+
+                        lineCount++;
+                        
+                        Destroy(_blockLocation[a, heigth].piece.gameObject, GameManager.Instance.destroyBlockTime);
                         _blockLocation[a, heigth] = null;
                     }
                     for (var k = heigth; k < transform.localScale.y; k++)
@@ -82,7 +94,7 @@ public class Grid : MonoBehaviour
                             if (_blockLocation[a, k + 1] == null) continue;
                             _blockLocation[a, k] = _blockLocation[a, k + 1];
                             _blockLocation[a, k + 1] = null;
-                            _blockLocation[a, k].piece.position  += new Vector3(0, -1, 0);
+                            StartCoroutine(PullDown(a, k));
                         }
                     }
                 }
@@ -94,6 +106,12 @@ public class Grid : MonoBehaviour
                 CheckLines(heigth);
             }
         }
+    }
+
+    private IEnumerator PullDown(int x, int y)
+    {
+        yield return new WaitForSeconds(GameManager.Instance.destroyBlockTime);
+        _blockLocation[x, y].piece.position  += new Vector3(0, -1, 0);
     }
 
     public bool IsGameOver(int posY)
