@@ -23,6 +23,7 @@ public class Block : MonoBehaviour
     private Color lightBlue = new Color(127f/255f, 175f/255f, 208f/255f);
     private Color blue = new Color(42f/255f, 122f/255f, 176f/255f);
     private Color darkBlue = new Color(21f/255f, 61f/255f, 88f/255f);
+    
 
     // Start is called before the first frame update
     void Start()
