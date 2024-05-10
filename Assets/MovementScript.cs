@@ -34,7 +34,10 @@ public class MovementScript : MonoBehaviour
         gameOverScript = GameObject.FindGameObjectWithTag("GameOver").GetComponent<GameOverScript>();
         gameAudioScript = GameObject.FindGameObjectWithTag("GameAudio").GetComponent<GameAudioScript>();
 
-        if (IsNextInfoPiece()) this.enabled = false;
+        if (IsNextInfoPiece())
+        {
+            isGameAlive = false;
+        }
     }
 
     private bool IsNextInfoPiece()
@@ -45,7 +48,11 @@ public class MovementScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isGameAlive) return;
+        if (!isGameAlive)
+        {
+            transform.Rotate(0,0.5f,0);
+            return;
+        }
         
         Vector3 move = default;
         
