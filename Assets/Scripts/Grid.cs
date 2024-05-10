@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -7,11 +8,13 @@ using Random = UnityEngine.Random;
 public class Grid : MonoBehaviour
 {
     public GameObject[] blocks;
+    public GameObject[] ghostBlocks;
     public GameObject spawnPoint;
     public GameObject newxtBlockPoint;
     public GameObject fireWorks;
     private int _nextBlock;
     private BlockPiece[,] _blockLocation;
+    private BlockPiece[,] _ghostLocation;
     private GameObject _nextBlockObj;
     private static int _previousScore = 0;
     private AudioManager _audioManager;
@@ -25,32 +28,49 @@ public class Grid : MonoBehaviour
     void Start()
     {
         _blockLocation = new BlockPiece[(int) transform.localScale.x, (int) transform.localScale.y];
+        _ghostLocation = new BlockPiece[(int) transform.localScale.x, (int) transform.localScale.y];
         NewBlock();
     }
     
-    public void UpdateBlocksPos(Transform blockObj, string id)
+    public void UpdateBlocksPos(Transform blockObj, string id, bool isGhost = false)
     {
         foreach (Transform block in blockObj)
         {
             var position = block.transform.position;
             var posX = Mathf.RoundToInt(position.x);
             var posY = Mathf.RoundToInt(position.y);
-            _blockLocation[posX, posY] = new BlockPiece(id, block);
+            if (isGhost)
+            {
+                _ghostLocation[posX, posY] = new BlockPiece(id, block);
+            } else
+            {
+                _blockLocation[posX, posY] = new BlockPiece(id, block);
+            }
         }
     }
-    public void ClearBlocksPos(Transform blockObj)
+    public void ClearBlocksPos(Transform blockObj, bool isGhost = false)
     {
         foreach (Transform block in blockObj)
         {
             var position = block.transform.position;
             var posX = Mathf.RoundToInt(position.x);
             var posY = Mathf.RoundToInt(position.y);
-            _blockLocation[posX, posY] = null;
+            if (isGhost)
+            {
+                _ghostLocation[posX, posY] = null;
+            } else
+            {
+                _blockLocation[posX, posY] = null;
+            }
         }
     }
 
-    public bool CanMove(int posX, int posY, string id)
+    public bool CanMove(int posX, int posY, string id, bool isGhost = false)
     {
+        if (isGhost)
+        {
+            return _ghostLocation[posX, posY] == null || _ghostLocation[posX, posY].id == id;
+        }
         return _blockLocation[posX, posY] == null || _blockLocation[posX, posY].id == id;
     }
 
@@ -107,8 +127,6 @@ public class Grid : MonoBehaviour
             }
         }
         
-        Debug.Log(lineCount);
-
         if (lineCount >= GameManager.Instance.lineNeededToActivateEffect)
         {
             StartCoroutine(CongratsEffect());
@@ -157,9 +175,72 @@ public class Grid : MonoBehaviour
         NewBlock();
     }
 
+    private bool YCollisionDetected(Block block, Transform ghostTransform)
+    {
+        foreach (Transform t in ghostTransform)
+        {
+            var position = t.position;
+            var posX = Mathf.RoundToInt(position.x);
+            var posY = Mathf.RoundToInt(position.y);
+            if (posY < 0)
+            {
+                return true;
+            }
+            if (_blockLocation[posX, posY] != null && _blockLocation[posX, posY].id != block.id) 
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Vector3 SetLowestYCoordinateForGhost(Transform transform)
+    {
+        var currentBlock = GameObject.FindGameObjectsWithTag("Block").Where(obj => obj.GetComponent<Block>().enabled).First().GetComponent<Block>();
+        while (YCollisionDetected(currentBlock, transform))
+        {
+            transform.position += new Vector3(0, 1);
+        }
+        return transform.position;
+    }
+
+    private bool CollisionDetected(BlockGhost ghost)
+    {
+        foreach (Transform block in ghost.transform)
+        {
+            var position = block.position;
+            var posX = Mathf.RoundToInt(position.x);
+            var posY = Mathf.RoundToInt(position.y);
+            if (posY < 0 && ghost.transform.position.y == 0)
+            {
+                return true;
+            }
+            if (posX >= 0 && posY >= 0 && _blockLocation[posX, posY] != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private GameObject CreateGhostAtValidPosition()
+    {
+        Vector3 ghostPosition = new Vector3(spawnPoint.transform.position.x, 0);
+        var ghost = Instantiate(ghostBlocks[_nextBlock], ghostPosition, quaternion.identity);
+        var ghostComponent = ghost.GetComponent<BlockGhost>();
+        while (CollisionDetected(ghostComponent))
+        {
+            ghostComponent.transform.position += new Vector3(0, 1);
+        }
+        return ghost;
+    }
+
     public void NewBlock()
     {
-        Instantiate(blocks[_nextBlock], spawnPoint.transform.position, quaternion.identity);
+        var currentBlock = Instantiate(blocks[_nextBlock], spawnPoint.transform.position, quaternion.identity);
+        var block = currentBlock.GetComponent<Block>();
+        block._ghost = CreateGhostAtValidPosition();
+        block._ghostBlock = block._ghost.GetComponent<BlockGhost>();
         _nextBlock = Random.Range(0, blocks.Length);
         Destroy(_nextBlockObj);
         _nextBlockObj = Instantiate(blocks[_nextBlock], newxtBlockPoint.transform.position, quaternion.identity);

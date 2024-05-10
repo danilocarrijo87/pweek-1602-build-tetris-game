@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -11,7 +12,12 @@ public class Block : MonoBehaviour
 
     private Grid _grid;
     [HideInInspector]
+    public GameObject _ghost;
+    [HideInInspector]
     public string id;
+    [HideInInspector]
+    public BlockGhost _ghostBlock;
+    
 
     private bool _isBlocked = false;
     private AudioManager _audioManager;
@@ -54,23 +60,24 @@ public class Block : MonoBehaviour
             {
                 _audioManager.PlaySFX(_audioManager.MovePiece);
                 MoveX(-1);
+                _ghostBlock.MoveX(-1);
             }
             if (Input.GetKeyDown(KeyCode.RightArrow) && CanMove(1))
             {
                 _audioManager.PlaySFX(_audioManager.MovePiece);
                 MoveX(1);
+                _ghostBlock.MoveX(1);
             }
             if (Input.GetKeyDown(KeyCode.UpArrow) && CanRotate())
             {
-                _audioManager.PlaySFX(_audioManager.SpinPiece);
-                _grid.ClearBlocksPos(this.transform);
-                transform.RotateAround(transform.TransformPoint(pivot), new Vector3(0,0,1), 90);
-                _grid.UpdateBlocksPos(this.transform, id);
+                RotateSelf();
+                 _ghostBlock.RotateSelf();
             }
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 _audioManager.PlaySFX(_audioManager.DropPiece);
                 HardDrop();
+                _grid.ClearBlocksPos(_ghostBlock.transform, true);
             } 
             else if (CanMove(0) && Time.time - _loopTime > (Input.GetKey(KeyCode.DownArrow) ? GameManager.Instance.gameSpeed / 10 : GameManager.Instance.gameSpeed))
             {
@@ -80,6 +87,14 @@ public class Block : MonoBehaviour
                 _grid.UpdateBlocksPos(this.transform, id);
             }
         }
+    }
+
+    private void RotateSelf()
+    {
+        _audioManager.PlaySFX(_audioManager.SpinPiece);
+        _grid.ClearBlocksPos(this.transform);
+        transform.RotateAround(transform.TransformPoint(pivot), new Vector3(0, 0, 1), 90);
+        _grid.UpdateBlocksPos(this.transform, id);
     }
 
     private void HardDrop()
@@ -166,6 +181,9 @@ public class Block : MonoBehaviour
     {
         _isBlocked = true;
         this.enabled = false;
+        _ghostBlock.isEnabled = false;
+        _grid.ClearBlocksPos(_ghostBlock.transform, true);
+        Destroy(_ghost);
         if (!_grid.IsGameOver(Mathf.RoundToInt(posY)))
         {
             _grid.UpdateBlocksPos(this.transform, id);
