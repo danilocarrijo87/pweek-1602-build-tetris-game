@@ -9,6 +9,7 @@ TagManager:
   - PieceSpawner
   - GameOver
   - GameAudio
+  - Piece
   layers:
   - Default
   - TransparentFX

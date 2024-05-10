@@ -23,6 +23,18 @@ public class GameAudioScript : MonoBehaviour
         PlayGameSound();
     }
 
+    public void PauseAllSounds()
+    {
+        MainAudioSource.Pause();
+        MoveAudioSource.Pause();
+    }
+
+    public void ResumeAllSounds()
+    {
+        MainAudioSource.UnPause();
+        MoveAudioSource.UnPause();
+    }
+    
     public void PlayGameSound()
     {
         MainAudioSource.clip = GameSound;

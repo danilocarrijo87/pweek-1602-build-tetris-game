@@ -15,6 +15,7 @@ public class MovementScript : MonoBehaviour
     private float previousTime;
     private float defaultFallTime = 1f;
     private bool isGameAlive = true;
+    private bool isInfoPiece = false;
 
     private Dictionary<int, Vector3> movements = new();
     
@@ -36,7 +37,7 @@ public class MovementScript : MonoBehaviour
 
         if (IsNextInfoPiece())
         {
-            isGameAlive = false;
+            isInfoPiece = true;
         }
     }
 
@@ -48,7 +49,7 @@ public class MovementScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isGameAlive)
+        if (isInfoPiece)
         {
             transform.Rotate(0,0.5f,0);
             return;
@@ -141,6 +142,7 @@ public class MovementScript : MonoBehaviour
             {
                 ResetMove(move);
                 this.enabled = false;
+                isGameAlive = false;
             
                 var isGameOver = gridManagement.IsGameOver(transform.position.y);
                 
@@ -162,6 +164,7 @@ public class MovementScript : MonoBehaviour
         {
             ResetMove(move);
             this.enabled = false;
+            isGameAlive = false;
 
             InvalidMove(transform);
         }
@@ -177,7 +180,28 @@ public class MovementScript : MonoBehaviour
         {
             gameAudioScript.PlayClearLineSound();
         };
+        
         spawnPieceScript.NewPiece();
+    }
+
+    public void PauseGame()
+    {
+        gameAudioScript.PauseAllSounds();
+        
+        if (!isInfoPiece)
+        {
+            this.enabled = false;
+        }
+    }
+    
+    public void ResumeGame()
+    {
+        if (isGameAlive)
+        {
+            this.enabled = true;
+        }
+        
+        gameAudioScript.ResumeAllSounds();
     }
 
     public void IncrementLowerSpeed(float value)
