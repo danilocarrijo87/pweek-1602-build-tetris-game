@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -11,7 +12,12 @@ public class Block : MonoBehaviour
 
     private Grid _grid;
     [HideInInspector]
+    public GameObject _ghost;
+    [HideInInspector]
     public string id;
+    [HideInInspector]
+    public BlockGhost _ghostBlock;
+    
 
 
     private bool _isBlocked = false;
@@ -28,6 +34,8 @@ public class Block : MonoBehaviour
     void Start()
     {
         _grid = GameObject.FindWithTag("Grid").GetComponent<Grid>();
+        // var ghosts = GameObject.FindGameObjectsWithTag("Ghost");
+        // _ghostBlock = ghosts.Where(ghost => (ghost.GetComponent<BlockGhost>()).isEnabled).First().GetComponent<BlockGhost>();
         var localScale = _grid.transform.localScale;
     }
 
@@ -52,20 +60,22 @@ public class Block : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.LeftArrow) && CanMove(-1))
             {
                 MoveX(-1);
+                _ghostBlock.MoveX(-1);
             }
             if (Input.GetKeyDown(KeyCode.RightArrow) && CanMove(1))
             {
                 MoveX(1);
+                _ghostBlock.MoveX(1);
             }
             if (Input.GetKeyDown(KeyCode.UpArrow) && CanRotate())
             {
-                _grid.ClearBlocksPos(this.transform);
-                transform.RotateAround(transform.TransformPoint(pivot), new Vector3(0,0,1), 90);
-                _grid.UpdateBlocksPos(this.transform, id);
+                RotateSelf();
+                 _ghostBlock.RotateSelf();
             }
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 HardDrop();
+                _grid.ClearBlocksPos(_ghostBlock.transform, true);
             } 
             else if (CanMove(0) && Time.time - _loopTime > (Input.GetKey(KeyCode.DownArrow) ? GameManager.Instance.gameSpeed / 10 : GameManager.Instance.gameSpeed))
             {
@@ -75,6 +85,13 @@ public class Block : MonoBehaviour
                 _grid.UpdateBlocksPos(this.transform, id);
             }
         }
+    }
+
+    private void RotateSelf()
+    {
+        _grid.ClearBlocksPos(this.transform);
+        transform.RotateAround(transform.TransformPoint(pivot), new Vector3(0, 0, 1), 90);
+        _grid.UpdateBlocksPos(this.transform, id);
     }
 
     private void HardDrop()
@@ -156,6 +173,9 @@ public class Block : MonoBehaviour
     {
         _isBlocked = true;
         this.enabled = false;
+        _ghostBlock.isEnabled = false;
+        _grid.ClearBlocksPos(_ghostBlock.transform, true);
+        Destroy(_ghost);
         if (!_grid.IsGameOver(Mathf.RoundToInt(posY)))
         {
             _grid.UpdateBlocksPos(this.transform, id);

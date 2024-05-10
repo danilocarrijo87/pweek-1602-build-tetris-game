@@ -5346,6 +5346,13 @@ MonoBehaviour:
   - {fileID: 5072906938553136662, guid: df233a4810db6c84588a08d72ed1ebf6, type: 3}
   - {fileID: 5244813288145838904, guid: 9aa156cac1d4fea4aa9a531053a7b1a4, type: 3}
   - {fileID: 8654849820246047604, guid: 092f43429989fd242893ac1f43711b83, type: 3}
+  ghostBlocks:
+  - {fileID: 2330481242948349157, guid: 564227746efa4fb4d97fe589d44b9456, type: 3}
+  - {fileID: 2223619487593730830, guid: fe5ce912381b0bd46b32b70592fb109a, type: 3}
+  - {fileID: 8811768563873052502, guid: fd9d716aa3cf44a4e840225a68329cff, type: 3}
+  - {fileID: 5072906938553136662, guid: e9f60aebe9e5107499201d7096318194, type: 3}
+  - {fileID: 5244813288145838904, guid: e23e0463a5ff67641b4f98aab592bf22, type: 3}
+  - {fileID: 8654849820246047604, guid: 13b5673e35bc85e49a26942183b6f32b, type: 3}
   spawnPoint: {fileID: 494348626}
   newxtBlockPoint: {fileID: 365588371}
   fireWorks: {fileID: 1779940782}
