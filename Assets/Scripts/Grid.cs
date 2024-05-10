@@ -9,11 +9,17 @@ public class Grid : MonoBehaviour
     public GameObject[] blocks;
     public GameObject spawnPoint;
     public GameObject newxtBlockPoint;
+    public GameObject fireWorks;
     private int _nextBlock;
     private BlockPiece[,] _blockLocation;
     private GameObject _nextBlockObj;
     private static int _previousScore = 0;
-    public GameObject fireWorks;
+    private AudioManager _audioManager;
+
+    private void Awake()
+    {
+        _audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
     
     // Start is called before the first frame update
     void Start()
@@ -58,6 +64,7 @@ public class Grid : MonoBehaviour
             }
         }
 
+        _audioManager.PlaySFX(_audioManager.PlayerScore);
         return true;
     }
 
@@ -129,6 +136,7 @@ public class Grid : MonoBehaviour
         if (posY == spawnPoint.transform.position.y)
         {
             GameManager.Instance.SetGameOver(true);
+            _audioManager.PlayMusicSource(_audioManager.GameOver);
             return true;
         }
 
@@ -145,6 +153,7 @@ public class Grid : MonoBehaviour
             }
         }
 
+        _audioManager.PlayMusicSource(_audioManager.Theme);
         NewBlock();
     }
 

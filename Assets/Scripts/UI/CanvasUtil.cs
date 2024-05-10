@@ -22,6 +22,8 @@ public class CanvasUtil : MonoBehaviour
     // Start is called before the first frame update
     public void PlayAgain()
     {
+        GameOverUI.gameObject.SetActive(false);
+        PlayAgainButton.gameObject.SetActive(false);
         GameManager.Instance.ResetGame();
     }
 }
