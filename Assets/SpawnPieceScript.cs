@@ -30,7 +30,7 @@ public class SpawnPieceScript : MonoBehaviour
         // For playable piece
         Destroy(nextBlock);
         var playableSpawn = GetPlayableSpawn();
-        Instantiate(Pieces[nextPiece], playableSpawn, Quaternion.identity);
+        Instantiate(Pieces[0], playableSpawn, Quaternion.identity);
         
         // For next piece
         nextPiece = Random.Range(0, Pieces.Length);

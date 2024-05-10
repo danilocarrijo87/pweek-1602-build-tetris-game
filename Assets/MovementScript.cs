@@ -10,6 +10,7 @@ public class MovementScript : MonoBehaviour
     private static GridManagement gridManagement;
     private SpawnPieceScript spawnPieceScript;
     private GameOverScript gameOverScript;
+    private GameAudioScript gameAudioScript;
     
     private float previousTime;
     private float defaultFallTime = 1f;
@@ -31,6 +32,7 @@ public class MovementScript : MonoBehaviour
         gridManagement = GameObject.FindWithTag("BoardGrid").GetComponent<GridManagement>();
         spawnPieceScript = GameObject.FindWithTag("PieceSpawner").GetComponent<SpawnPieceScript>();
         gameOverScript = GameObject.FindGameObjectWithTag("GameOver").GetComponent<GameOverScript>();
+        gameAudioScript = GameObject.FindGameObjectWithTag("GameAudio").GetComponent<GameAudioScript>();
 
         if (IsNextInfoPiece()) this.enabled = false;
     }
@@ -79,6 +81,11 @@ public class MovementScript : MonoBehaviour
             if (!gridManagement.ValidMove(transform))
             {
                 ResetMove(move);
+                gameAudioScript.PlayBlockSound();
+            }
+            else
+            {
+                gameAudioScript.PlayMoveSound();
             }
         }
 
@@ -103,6 +110,11 @@ public class MovementScript : MonoBehaviour
         if (!gridManagement.ValidMove(transform))
         {
             transform.localEulerAngles -= move;
+            gameAudioScript.PlayBlockSound();
+        }
+        else
+        {
+            gameAudioScript.PlayRotateSound();
         }
     }
 
@@ -133,6 +145,7 @@ public class MovementScript : MonoBehaviour
                 {
                     isGameAlive = false;
                     spawnPieceScript.GameOver();
+                    gameAudioScript.PlayGameOverSound();
                     gameOverScript.GameOver();
                     //gridManagement.ResetGame();
                 }
@@ -151,8 +164,12 @@ public class MovementScript : MonoBehaviour
 
     private void InvalidMove(Transform piece)
     {
+        gameAudioScript.PlayDropSound();
         gridManagement.AddPieceToSpace(transform);
-        gridManagement.CheckCompletedPlanes(transform);
+        if (gridManagement.CompletedPlanes(transform))
+        {
+            gameAudioScript.PlayClearLineSound();
+        };
         spawnPieceScript.NewPiece();
     }
 

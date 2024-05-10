@@ -67,13 +67,15 @@ public class GridManagement : MonoBehaviour
         return true;
     }
 
-    public void CheckCompletedPlanes(Transform piece)
+    public bool CompletedPlanes(Transform piece)
     {
         // I think we can start checking for completed line from the small Y coord of the new piece
         var intervalY = GetMinAndMaxY(piece);
         var completedLines = CheckPlane();
         
         scoreManagement.AddScore(completedLines);
+
+        return completedLines > 0;
     }
 
     private int CheckPlane(int coordYToCheck = 0)

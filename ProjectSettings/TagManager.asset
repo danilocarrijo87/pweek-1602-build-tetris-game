@@ -8,6 +8,7 @@ TagManager:
   - ScoreLogic
   - PieceSpawner
   - GameOver
+  - GameAudio
   layers:
   - Default
   - TransparentFX
