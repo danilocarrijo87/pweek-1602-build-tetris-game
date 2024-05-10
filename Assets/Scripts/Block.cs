@@ -34,8 +34,6 @@ public class Block : MonoBehaviour
     void Start()
     {
         _grid = GameObject.FindWithTag("Grid").GetComponent<Grid>();
-        // var ghosts = GameObject.FindGameObjectsWithTag("Ghost");
-        // _ghostBlock = ghosts.Where(ghost => (ghost.GetComponent<BlockGhost>()).isEnabled).First().GetComponent<BlockGhost>();
         var localScale = _grid.transform.localScale;
     }
 
