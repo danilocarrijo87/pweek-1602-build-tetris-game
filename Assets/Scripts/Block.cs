@@ -13,8 +13,8 @@ public class Block : MonoBehaviour
     [HideInInspector]
     public string id;
 
-
     private bool _isBlocked = false;
+    private AudioManager _audioManager;
     private Color color;
 
     private Color lightGreen = new Color(171f/255f, 211f/255f, 179f/255f);
@@ -34,6 +34,7 @@ public class Block : MonoBehaviour
     private void Awake()
     {
         id = Guid.NewGuid().ToString();
+        _audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
         List<Color> blockColors = new List<Color>() { lightGreen, green, darkGreen, lightBlue, blue, darkBlue };
         SpriteRenderer[] sprites = GetComponentsInChildren<SpriteRenderer>();
         color = blockColors[UnityEngine.Random.Range(0, blockColors.Count - 1)];
@@ -51,20 +52,24 @@ public class Block : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.LeftArrow) && CanMove(-1))
             {
+                _audioManager.PlaySFX(_audioManager.MovePiece);
                 MoveX(-1);
             }
             if (Input.GetKeyDown(KeyCode.RightArrow) && CanMove(1))
             {
+                _audioManager.PlaySFX(_audioManager.MovePiece);
                 MoveX(1);
             }
             if (Input.GetKeyDown(KeyCode.UpArrow) && CanRotate())
             {
+                _audioManager.PlaySFX(_audioManager.SpinPiece);
                 _grid.ClearBlocksPos(this.transform);
                 transform.RotateAround(transform.TransformPoint(pivot), new Vector3(0,0,1), 90);
                 _grid.UpdateBlocksPos(this.transform, id);
             }
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                _audioManager.PlaySFX(_audioManager.DropPiece);
                 HardDrop();
             } 
             else if (CanMove(0) && Time.time - _loopTime > (Input.GetKey(KeyCode.DownArrow) ? GameManager.Instance.gameSpeed / 10 : GameManager.Instance.gameSpeed))
@@ -111,11 +116,13 @@ public class Block : MonoBehaviour
 
             if (posX < 0 || posX >= _grid.transform.localScale.x)
             {
+                _audioManager.PlaySFX(_audioManager.CantMove);
                 return false;
             }
 
             if (!_grid.CanMove(posX, posY, id))
             {
+                _audioManager.PlaySFX(_audioManager.CantMove);
                 return false;
             }
         }
@@ -132,11 +139,13 @@ public class Block : MonoBehaviour
             
             if (posX < 0 || posX >= _grid.transform.localScale.x)
             {
+                if(xModifier != 0) _audioManager.PlaySFX(_audioManager.CantMove);
                 return false;
             }
 
             if (posY < 0)
             {
+                if(xModifier != 0) _audioManager.PlaySFX(_audioManager.CantMove);
                 DisableBlockAndAddAnotherIfNotGameOver(position.y);
                 return false;
             }
@@ -144,6 +153,7 @@ public class Block : MonoBehaviour
             var canMove = _grid.CanMove(posX, posY, id);
             if (!canMove)
             {
+                if(xModifier != 0) _audioManager.PlaySFX(_audioManager.CantMove);
                 DisableBlockAndAddAnotherIfNotGameOver(position.y);
                 return false;
             }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Grid
   - Block
+  - Audio
   layers:
   - Default
   - TransparentFX
