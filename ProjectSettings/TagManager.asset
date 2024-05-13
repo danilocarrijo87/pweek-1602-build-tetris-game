@@ -7,6 +7,9 @@ TagManager:
   - BoardGrid
   - ScoreLogic
   - PieceSpawner
+  - GameOver
+  - GameAudio
+  - Piece
   layers:
   - Default
   - TransparentFX

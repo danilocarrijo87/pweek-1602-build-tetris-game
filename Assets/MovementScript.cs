@@ -9,10 +9,13 @@ public class MovementScript : MonoBehaviour
 {
     private static GridManagement gridManagement;
     private SpawnPieceScript spawnPieceScript;
+    private GameOverScript gameOverScript;
+    private GameAudioScript gameAudioScript;
     
     private float previousTime;
     private float defaultFallTime = 1f;
     private bool isGameAlive = true;
+    private bool isInfoPiece = false;
 
     private Dictionary<int, Vector3> movements = new();
     
@@ -29,12 +32,28 @@ public class MovementScript : MonoBehaviour
         
         gridManagement = GameObject.FindWithTag("BoardGrid").GetComponent<GridManagement>();
         spawnPieceScript = GameObject.FindWithTag("PieceSpawner").GetComponent<SpawnPieceScript>();
+        gameOverScript = GameObject.FindGameObjectWithTag("GameOver").GetComponent<GameOverScript>();
+        gameAudioScript = GameObject.FindGameObjectWithTag("GameAudio").GetComponent<GameAudioScript>();
+
+        if (IsNextInfoPiece())
+        {
+            isInfoPiece = true;
+        }
+    }
+
+    private bool IsNextInfoPiece()
+    {
+        return !gridManagement.ValidMove(transform, false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!isGameAlive) return;
+        if (isInfoPiece)
+        {
+            transform.Rotate(0,0.5f,0);
+            return;
+        }
         
         Vector3 move = default;
         
@@ -70,6 +89,11 @@ public class MovementScript : MonoBehaviour
             if (!gridManagement.ValidMove(transform))
             {
                 ResetMove(move);
+                gameAudioScript.PlayBlockSound();
+            }
+            else
+            {
+                gameAudioScript.PlayMoveSound();
             }
         }
 
@@ -94,6 +118,11 @@ public class MovementScript : MonoBehaviour
         if (!gridManagement.ValidMove(transform))
         {
             transform.localEulerAngles -= move;
+            gameAudioScript.PlayBlockSound();
+        }
+        else
+        {
+            gameAudioScript.PlayRotateSound();
         }
     }
 
@@ -113,6 +142,7 @@ public class MovementScript : MonoBehaviour
             {
                 ResetMove(move);
                 this.enabled = false;
+                isGameAlive = false;
             
                 var isGameOver = gridManagement.IsGameOver(transform.position.y);
                 
@@ -124,6 +154,8 @@ public class MovementScript : MonoBehaviour
                 {
                     isGameAlive = false;
                     spawnPieceScript.GameOver();
+                    gameAudioScript.PlayGameOverSound();
+                    gameOverScript.GameOver();
                     //gridManagement.ResetGame();
                 }
             }
@@ -132,6 +164,7 @@ public class MovementScript : MonoBehaviour
         {
             ResetMove(move);
             this.enabled = false;
+            isGameAlive = false;
 
             InvalidMove(transform);
         }
@@ -141,9 +174,34 @@ public class MovementScript : MonoBehaviour
 
     private void InvalidMove(Transform piece)
     {
+        gameAudioScript.PlayDropSound();
         gridManagement.AddPieceToSpace(transform);
-        gridManagement.CheckCompletedPlanes(transform);
+        if (gridManagement.CompletedPlanes(transform))
+        {
+            gameAudioScript.PlayClearLineSound();
+        };
+        
         spawnPieceScript.NewPiece();
+    }
+
+    public void PauseGame()
+    {
+        gameAudioScript.PauseAllSounds();
+        
+        if (!isInfoPiece)
+        {
+            this.enabled = false;
+        }
+    }
+    
+    public void ResumeGame()
+    {
+        if (isGameAlive)
+        {
+            this.enabled = true;
+        }
+        
+        gameAudioScript.ResumeAllSounds();
     }
 
     public void IncrementLowerSpeed(float value)
